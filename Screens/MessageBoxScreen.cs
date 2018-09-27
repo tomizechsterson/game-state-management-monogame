@@ -46,7 +46,7 @@ namespace MgGSM.Screens
         public MessageBoxScreen(string message, bool includeUsageText)
         {
             const string usageText = "\nA button, Space, Enter = ok" +
-                                     "\nB button, Esc = cancel"; 
+                                     "\nB button, Backspace = cancel"; 
             
             if (includeUsageText)
                 this.message = message + usageText;
@@ -60,11 +60,11 @@ namespace MgGSM.Screens
 
             menuSelect = new InputAction(
                 new Buttons[] { Buttons.A, Buttons.Start },
-                new Keys[] { Keys.Space, Keys.Enter },
+                new Keys[] { Keys.Enter, Keys.Space },
                 true);
             menuCancel = new InputAction(
                 new Buttons[] { Buttons.B, Buttons.Back },
-                new Keys[] { Keys.Escape, Keys.Back },
+                new Keys[] { Keys.Back },
                 true);
         }
 

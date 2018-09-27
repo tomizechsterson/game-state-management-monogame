@@ -12,17 +12,17 @@ namespace MgGSM.Screens
     {
         #region Fields
 
-        ContentManager content;
-        SpriteFont gameFont;
+        private ContentManager _content;
+        private SpriteFont _gameFont;
 
-        Vector2 playerPosition = new Vector2(100, 100);
-        Vector2 enemyPosition = new Vector2(100, 100);
+        private Vector2 _playerPosition = new Vector2(100, 100);
+        private Vector2 _enemyPosition = new Vector2(100, 100);
 
-        Random random = new Random();
+        private readonly Random _random = new Random();
 
-        float pauseAlpha;
+        private float _pauseAlpha;
 
-        InputAction pauseAction;
+        private readonly InputAction _pauseAction;
 
         #endregion
 
@@ -37,9 +37,9 @@ namespace MgGSM.Screens
             TransitionOnTime = TimeSpan.FromSeconds(1.5);
             TransitionOffTime = TimeSpan.FromSeconds(0.5);
 
-            pauseAction = new InputAction(
+            _pauseAction = new InputAction(
                 new Buttons[] { Buttons.Start, Buttons.Back },
-                new Keys[] { Keys.Escape },
+                new Keys[] { Keys.Back },
                 true);
         }
 
@@ -51,10 +51,10 @@ namespace MgGSM.Screens
         {
             if (!instancePreserved)
             {
-                if (content == null)
-                    content = new ContentManager(ScreenManager.Game.Services, "Content");
+                if (_content == null)
+                    _content = new ContentManager(ScreenManager.Game.Services, "Content");
 
-                gameFont = content.Load<SpriteFont>("gamefont");
+                _gameFont = _content.Load<SpriteFont>("gamefont");
 
                 // A real game would probably have more content than this sample, so
                 // it would take longer to load. We simulate that by delaying for a
@@ -93,7 +93,7 @@ namespace MgGSM.Screens
         /// </summary>
         public override void Unload()
         {
-            content.Unload();
+            _content.Unload();
 
 #if WINDOWS_PHONE
             Microsoft.Phone.Shell.PhoneApplicationService.Current.State.Remove("PlayerPosition");
@@ -119,24 +119,24 @@ namespace MgGSM.Screens
 
             // Gradually fade in or out depending on whether we are covered by the pause screen.
             if (coveredByOtherScreen)
-                pauseAlpha = Math.Min(pauseAlpha + 1f / 32, 1);
+                _pauseAlpha = Math.Min(_pauseAlpha + 1f / 32, 1);
             else
-                pauseAlpha = Math.Max(pauseAlpha - 1f / 32, 0);
+                _pauseAlpha = Math.Max(_pauseAlpha - 1f / 32, 0);
 
             if (IsActive)
             {
                 // Apply some random jitter to make the enemy move around.
                 const float randomization = 10;
 
-                enemyPosition.X += (float)(random.NextDouble() - 0.5) * randomization;
-                enemyPosition.Y += (float)(random.NextDouble() - 0.5) * randomization;
+                _enemyPosition.X += (float)(_random.NextDouble() - 0.5) * randomization;
+                _enemyPosition.Y += (float)(_random.NextDouble() - 0.5) * randomization;
 
                 // Apply a stabilizing force to stop the enemy moving off the screen.
                 Vector2 targetPosition = new Vector2(
-                    ScreenManager.GraphicsDevice.Viewport.Width / 2 - gameFont.MeasureString("Insert Gameplay Here").X / 2, 
+                    ScreenManager.GraphicsDevice.Viewport.Width / 2 - _gameFont.MeasureString("Insert Gameplay Here").X / 2, 
                     200);
 
-                enemyPosition = Vector2.Lerp(enemyPosition, targetPosition, 0.05f);
+                _enemyPosition = Vector2.Lerp(_enemyPosition, targetPosition, 0.05f);
 
                 // This game isn't very fun! You could probably improve
                 // it by inserting something more interesting in this space :-)
@@ -167,7 +167,7 @@ namespace MgGSM.Screens
                                        input.GamePadWasConnected[playerIndex];
 
             PlayerIndex player;
-            if (pauseAction.Evaluate(input, ControllingPlayer, out player) || gamePadDisconnected)
+            if (_pauseAction.Evaluate(input, ControllingPlayer, out player) || gamePadDisconnected)
             {
 #if WINDOWS_PHONE
                 ScreenManager.AddScreen(new PhonePauseScreen(), ControllingPlayer);
@@ -200,7 +200,7 @@ namespace MgGSM.Screens
                 if (input.TouchState.Count > 0)
                 {
                     Vector2 touchPosition = input.TouchState[0].Position;
-                    Vector2 direction = touchPosition - playerPosition;
+                    Vector2 direction = touchPosition - _playerPosition;
                     direction.Normalize();
                     movement += direction;
                 }
@@ -208,7 +208,7 @@ namespace MgGSM.Screens
                 if (movement.Length() > 1)
                     movement.Normalize();
 
-                playerPosition += movement * 8f;
+                _playerPosition += movement * 8f;
             }
         }
 
@@ -227,17 +227,17 @@ namespace MgGSM.Screens
 
             spriteBatch.Begin();
 
-            spriteBatch.DrawString(gameFont, "// TODO", playerPosition, Color.Green);
+            spriteBatch.DrawString(_gameFont, "// TODO", _playerPosition, Color.Green);
 
-            spriteBatch.DrawString(gameFont, "Insert Gameplay Here",
-                                   enemyPosition, Color.DarkRed);
+            spriteBatch.DrawString(_gameFont, "Insert Gameplay Here",
+                                   _enemyPosition, Color.DarkRed);
 
             spriteBatch.End();
 
             // If the game is transitioning on or off, fade it out to black.
-            if (TransitionPosition > 0 || pauseAlpha > 0)
+            if (TransitionPosition > 0 || _pauseAlpha > 0)
             {
-                float alpha = MathHelper.Lerp(1f - TransitionAlpha, 1f, pauseAlpha / 2);
+                float alpha = MathHelper.Lerp(1f - TransitionAlpha, 1f, _pauseAlpha / 2);
 
                 ScreenManager.FadeBackBufferToBlack(alpha);
             }

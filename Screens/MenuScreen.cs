@@ -64,7 +64,7 @@ namespace MgGSM.Screens
                 true);
             menuCancel = new InputAction(
                 new Buttons[] { Buttons.B, Buttons.Back },
-                new Keys[] { Keys.Escape },
+                new Keys[] { Keys.Back },
                 true);
         }
 
