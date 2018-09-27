@@ -8,25 +8,14 @@ namespace MgGSM.Screens
 {
     public class BackgroundScreen : GameScreen
     {
-        #region Fields
+        private ContentManager _content;
+        private Texture2D _backgroundTexture;
 
-        ContentManager content;
-        Texture2D backgroundTexture;
-
-        #endregion
-
-        #region Initialization
-
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
         public BackgroundScreen()
         {
             TransitionOnTime = TimeSpan.FromSeconds(0.5);
             TransitionOffTime = TimeSpan.FromSeconds(0.5);
         }
-
 
         /// <summary>
         /// Loads graphics content for this screen. The background texture is quite
@@ -39,60 +28,39 @@ namespace MgGSM.Screens
         {
             if (!instancePreserved)
             {
-                if (content == null)
-                    content = new ContentManager(ScreenManager.Game.Services, "Content");
+                if (_content == null)
+                    _content = new ContentManager(ScreenManager.Game.Services, "Content");
 
-                backgroundTexture = content.Load<Texture2D>("background");
+                _backgroundTexture = _content.Load<Texture2D>("background");
             }
         }
 
-
-        /// <summary>
-        /// Unloads graphics content for this screen.
-        /// </summary>
         public override void Unload()
         {
-            content.Unload();
+            _content.Unload();
         }
 
-
-        #endregion
-
-        #region Update and Draw
-
-
-        /// <summary>
-        /// Updates the background screen. Unlike most screens, this should not
-        /// transition off even if it has been covered by another screen: it is
-        /// supposed to be covered, after all! This overload forces the
-        /// coveredByOtherScreen parameter to false in order to stop the base
-        /// Update method wanting to transition off.
-        /// </summary>
-        public override void Update(GameTime gameTime, bool otherScreenHasFocus,
-                                                       bool coveredByOtherScreen)
+        // Unlike most screens, this should not transition off even if
+        // it has been covered by another screen: it is supposed to be
+        // covered, after all! This overload forces the coveredByOtherScreen
+        // parameter to false in order to stop the base Update method wanting to transition off.
+        public override void Update(GameTime gameTime, bool otherScreenHasFocus, bool coveredByOtherScreen)
         {
             base.Update(gameTime, otherScreenHasFocus, false);
         }
 
-
-        /// <summary>
-        /// Draws the background screen.
-        /// </summary>
         public override void Draw(GameTime gameTime)
         {
-            SpriteBatch spriteBatch = ScreenManager.SpriteBatch;
-            Viewport viewport = ScreenManager.GraphicsDevice.Viewport;
-            Rectangle fullscreen = new Rectangle(0, 0, viewport.Width, viewport.Height);
+            var spriteBatch = ScreenManager.SpriteBatch;
+            var viewport = ScreenManager.GraphicsDevice.Viewport;
+            var fullscreen = new Rectangle(0, 0, viewport.Width, viewport.Height);
 
             spriteBatch.Begin();
 
-            spriteBatch.Draw(backgroundTexture, fullscreen,
-                             new Color(TransitionAlpha, TransitionAlpha, TransitionAlpha));
+            spriteBatch.Draw(_backgroundTexture, fullscreen, 
+                new Color(TransitionAlpha, TransitionAlpha, TransitionAlpha));
 
             spriteBatch.End();
         }
-
-
-        #endregion
     }
 }
