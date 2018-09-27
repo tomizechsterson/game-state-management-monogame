@@ -10,8 +10,6 @@ namespace MgGSM.Screens
 {
     public class GameplayScreen : GameScreen
     {
-        #region Fields
-
         private ContentManager _content;
         private SpriteFont _gameFont;
 
@@ -21,32 +19,19 @@ namespace MgGSM.Screens
         private readonly Random _random = new Random();
 
         private float _pauseAlpha;
-
         private readonly InputAction _pauseAction;
 
-        #endregion
-
-        #region Initialization
-
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
         public GameplayScreen()
         {
             TransitionOnTime = TimeSpan.FromSeconds(1.5);
             TransitionOffTime = TimeSpan.FromSeconds(0.5);
 
             _pauseAction = new InputAction(
-                new Buttons[] { Buttons.Start, Buttons.Back },
-                new Keys[] { Keys.Back },
-                true);
+                new[] { Buttons.Start, Buttons.Back },
+                new[] { Keys.Back }, true);
         }
 
-
-        /// <summary>
-        /// Load graphics content for the game.
-        /// </summary>
+        // Load graphics content for the game
         public override void Activate(bool instancePreserved)
         {
             if (!instancePreserved)
@@ -87,33 +72,18 @@ namespace MgGSM.Screens
             base.Deactivate();
         }
 
-
-        /// <summary>
-        /// Unload graphics content used by the game.
-        /// </summary>
         public override void Unload()
         {
             _content.Unload();
-
 #if WINDOWS_PHONE
             Microsoft.Phone.Shell.PhoneApplicationService.Current.State.Remove("PlayerPosition");
             Microsoft.Phone.Shell.PhoneApplicationService.Current.State.Remove("EnemyPosition");
 #endif
         }
 
-
-        #endregion
-
-        #region Update and Draw
-
-
-        /// <summary>
-        /// Updates the state of the game. This method checks the GameScreen.IsActive
-        /// property, so the game will stop updating when the pause menu is active,
-        /// or if you tab away to a different application.
-        /// </summary>
-        public override void Update(GameTime gameTime, bool otherScreenHasFocus,
-                                                       bool coveredByOtherScreen)
+        // This method checks the GameScreen.IsActive property, so the game will
+        // stop updating when the pause menu is active, or if you tab away to a different application.
+        public override void Update(GameTime gameTime, bool otherScreenHasFocus, bool coveredByOtherScreen)
         {
             base.Update(gameTime, otherScreenHasFocus, false);
 
@@ -143,11 +113,7 @@ namespace MgGSM.Screens
             }
         }
 
-
-        /// <summary>
-        /// Lets the game respond to player input. Unlike the Update method,
-        /// this will only be called when the gameplay screen is active.
-        /// </summary>
+        // Unlike the Update method, this will only be called when the gameplay screen is active.
         public override void HandleInput(GameTime gameTime, InputState input)
         {
             if (input == null)
@@ -156,15 +122,14 @@ namespace MgGSM.Screens
             // Look up inputs for the active player profile.
             int playerIndex = (int)ControllingPlayer.Value;
 
-            KeyboardState keyboardState = input.CurrentKeyboardStates[playerIndex];
-            GamePadState gamePadState = input.CurrentGamePadStates[playerIndex];
+            var keyboardState = input.CurrentKeyboardStates[playerIndex];
+            var gamePadState = input.CurrentGamePadStates[playerIndex];
 
             // The game pauses either if the user presses the pause button, or if
             // they unplug the active gamepad. This requires us to keep track of
             // whether a gamepad was ever plugged in, because we don't want to pause
             // on PC if they are playing with a keyboard and have no gamepad at all!
-            bool gamePadDisconnected = !gamePadState.IsConnected &&
-                                       input.GamePadWasConnected[playerIndex];
+            bool gamePadDisconnected = !gamePadState.IsConnected && input.GamePadWasConnected[playerIndex];
 
             PlayerIndex player;
             if (_pauseAction.Evaluate(input, ControllingPlayer, out player) || gamePadDisconnected)
@@ -178,7 +143,7 @@ namespace MgGSM.Screens
             else
             {
                 // Otherwise move the player position.
-                Vector2 movement = Vector2.Zero;
+                var movement = Vector2.Zero;
 
                 if (keyboardState.IsKeyDown(Keys.Left))
                     movement.X--;
@@ -192,15 +157,15 @@ namespace MgGSM.Screens
                 if (keyboardState.IsKeyDown(Keys.Down))
                     movement.Y++;
 
-                Vector2 thumbstick = gamePadState.ThumbSticks.Left;
+                var thumbstick = gamePadState.ThumbSticks.Left;
 
                 movement.X += thumbstick.X;
                 movement.Y -= thumbstick.Y;
 
                 if (input.TouchState.Count > 0)
                 {
-                    Vector2 touchPosition = input.TouchState[0].Position;
-                    Vector2 direction = touchPosition - _playerPosition;
+                    var touchPosition = input.TouchState[0].Position;
+                    var direction = touchPosition - _playerPosition;
                     direction.Normalize();
                     movement += direction;
                 }
@@ -212,23 +177,17 @@ namespace MgGSM.Screens
             }
         }
 
-
-        /// <summary>
-        /// Draws the gameplay screen.
-        /// </summary>
         public override void Draw(GameTime gameTime)
         {
             // This game has a blue background. Why? Because!
-            ScreenManager.GraphicsDevice.Clear(ClearOptions.Target,
-                                               Color.CornflowerBlue, 0, 0);
+            ScreenManager.GraphicsDevice.Clear(ClearOptions.Target, Color.CornflowerBlue, 0, 0);
 
             // Our player and enemy are both actually just text strings.
-            SpriteBatch spriteBatch = ScreenManager.SpriteBatch;
+            var spriteBatch = ScreenManager.SpriteBatch;
 
             spriteBatch.Begin();
 
             spriteBatch.DrawString(_gameFont, "// TODO", _playerPosition, Color.Green);
-
             spriteBatch.DrawString(_gameFont, "Insert Gameplay Here",
                                    _enemyPosition, Color.DarkRed);
 
@@ -242,8 +201,5 @@ namespace MgGSM.Screens
                 ScreenManager.FadeBackBufferToBlack(alpha);
             }
         }
-
-
-        #endregion
     }
 }
