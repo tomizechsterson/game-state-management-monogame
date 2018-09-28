@@ -20,12 +20,12 @@ namespace MgGSM.Screens
             MenuEntries.Add(exitMenuEntry);
         }
 
-        void PlayGameMenuEntrySelected(object sender, PlayerIndexEventArgs e)
+        private void PlayGameMenuEntrySelected(object sender, PlayerIndexEventArgs e)
         {
             LoadingScreen.Load(ScreenManager, true, e.PlayerIndex, new GameplayScreen());
         }
 
-        void OptionsMenuEntrySelected(object sender, PlayerIndexEventArgs e)
+        private void OptionsMenuEntrySelected(object sender, PlayerIndexEventArgs e)
         {
             ScreenManager.AddScreen(new OptionsMenuScreen(), e.PlayerIndex);
         }
@@ -33,7 +33,6 @@ namespace MgGSM.Screens
         protected override void OnCancel(PlayerIndex playerIndex)
         {
             const string message = "Are you sure you want to exit this sample?";
-
             var confirmExitMessageBox = new MessageBoxScreen(message);
 
             confirmExitMessageBox.Accepted += ConfirmExitMessageBoxAccepted;
