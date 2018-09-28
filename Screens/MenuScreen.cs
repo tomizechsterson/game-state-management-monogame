@@ -58,7 +58,6 @@ namespace MgGSM.Screens
             // OnSelectEntry and OnCancel, so they can tell which player triggered them.
             PlayerIndex playerIndex;
 
-            // Move to the previous menu entry?
             if (_menuUp.Evaluate(input, ControllingPlayer, out playerIndex))
             {
                 _selectedEntry--;
@@ -67,7 +66,6 @@ namespace MgGSM.Screens
                     _selectedEntry = _menuEntries.Count - 1;
             }
 
-            // Move to the next menu entry?
             if (_menuDown.Evaluate(input, ControllingPlayer, out playerIndex))
             {
                 _selectedEntry++;
@@ -111,10 +109,8 @@ namespace MgGSM.Screens
             var position = new Vector2(0f, 175f);
 
             // update each menu entry's location in turn
-            for (int i = 0; i < _menuEntries.Count; i++)
+            foreach (var menuEntry in _menuEntries)
             {
-                var menuEntry = _menuEntries[i];
-                
                 // each entry is to be centered horizontally
                 position.X = ScreenManager.GraphicsDevice.Viewport.Width / 2 - menuEntry.GetWidth(this) / 2;
 
@@ -138,7 +134,7 @@ namespace MgGSM.Screens
             // Update each nested MenuEntry object.
             for (int i = 0; i < _menuEntries.Count; i++)
             {
-                bool isSelected = IsActive && (i == _selectedEntry);
+                bool isSelected = IsActive && i == _selectedEntry;
                 _menuEntries[i].Update(this, isSelected, gameTime);
             }
         }
@@ -154,11 +150,10 @@ namespace MgGSM.Screens
 
             spriteBatch.Begin();
 
-            // Draw each menu entry in turn.
             for (int i = 0; i < _menuEntries.Count; i++)
             {
                 var menuEntry = _menuEntries[i];
-                bool isSelected = IsActive && (i == _selectedEntry);
+                bool isSelected = IsActive && i == _selectedEntry;
                 menuEntry.Draw(this, isSelected, gameTime);
             }
 
@@ -171,12 +166,12 @@ namespace MgGSM.Screens
             var titlePosition = new Vector2(graphics.Viewport.Width / 2, 80);
             var titleOrigin = font.MeasureString(_menuTitle) / 2;
             var titleColor = new Color(192, 192, 192) * TransitionAlpha;
-            float titleScale = 1.25f;
+            const float titleScale = 1.25f;
 
             titlePosition.Y -= transitionOffset * 100;
 
-            spriteBatch.DrawString(font, _menuTitle, titlePosition, titleColor, 0,
-                titleOrigin, titleScale, SpriteEffects.None, 0);
+            spriteBatch.DrawString(font, _menuTitle, titlePosition, titleColor,
+                0, titleOrigin, titleScale, SpriteEffects.None, 0);
 
             spriteBatch.End();
         }
