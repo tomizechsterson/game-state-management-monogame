@@ -7,77 +7,48 @@ using Microsoft.Xna.Framework.Input;
 
 namespace MgGSM.Screens
 {
+    // Base class for screens that contain a menu of options. The user can
+    // move up and down to select an entry, or cancel to back out of the screen.
     public abstract class MenuScreen : GameScreen
     {
-        #region Fields
+        private readonly List<MenuEntry> _menuEntries = new List<MenuEntry>();
+        private int _selectedEntry;
+        private readonly string _menuTitle;
 
-        List<MenuEntry> menuEntries = new List<MenuEntry>();
-        int selectedEntry = 0;
-        string menuTitle;
+        private readonly InputAction _menuUp;
+        private readonly InputAction _menuDown;
+        private readonly InputAction _menuSelect;
+        private readonly InputAction _menuCancel;
 
-        InputAction menuUp;
-        InputAction menuDown;
-        InputAction menuSelect;
-        InputAction menuCancel;
+        // Gets the list of menu entries, so derived classes can add or change the menu contents.
+        protected IList<MenuEntry> MenuEntries => _menuEntries;
 
-        #endregion
-
-        #region Properties
-
-
-        /// <summary>
-        /// Gets the list of menu entries, so derived classes can add
-        /// or change the menu contents.
-        /// </summary>
-        protected IList<MenuEntry> MenuEntries
+        protected MenuScreen(string menuTitle)
         {
-            get { return menuEntries; }
-        }
-
-
-        #endregion
-
-        #region Initialization
-
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public MenuScreen(string menuTitle)
-        {
-            this.menuTitle = menuTitle;
+            _menuTitle = menuTitle;
 
             TransitionOnTime = TimeSpan.FromSeconds(0.5);
             TransitionOffTime = TimeSpan.FromSeconds(0.5);
 
-            menuUp = new InputAction(
-                new Buttons[] { Buttons.DPadUp, Buttons.LeftThumbstickUp }, 
-                new Keys[] { Keys.Up },
+            _menuUp = new InputAction(
+                new[] { Buttons.DPadUp, Buttons.LeftThumbstickUp }, 
+                new[] { Keys.Up },
                 true);
-            menuDown = new InputAction(
-                new Buttons[] { Buttons.DPadDown, Buttons.LeftThumbstickDown },
-                new Keys[] { Keys.Down },
+            _menuDown = new InputAction(
+                new[] { Buttons.DPadDown, Buttons.LeftThumbstickDown },
+                new[] { Keys.Down },
                 true);
-            menuSelect = new InputAction(
-                new Buttons[] { Buttons.A, Buttons.Start },
-                new Keys[] { Keys.Enter, Keys.Space },
+            _menuSelect = new InputAction(
+                new[] { Buttons.A, Buttons.Start },
+                new[] { Keys.Enter, Keys.Space },
                 true);
-            menuCancel = new InputAction(
-                new Buttons[] { Buttons.B, Buttons.Back },
-                new Keys[] { Keys.Back },
+            _menuCancel = new InputAction(
+                new[] { Buttons.B, Buttons.Back },
+                new[] { Keys.Back },
                 true);
         }
 
-
-        #endregion
-
-        #region Handle Input
-
-
-        /// <summary>
-        /// Responds to user input, changing the selected entry and accepting
-        /// or cancelling the menu.
-        /// </summary>
+        // Responds to user input, changing the selected entry and accepting or cancelling the menu.
         public override void HandleInput(GameTime gameTime, InputState input)
         {
             // For input tests we pass in our ControllingPlayer, which may
@@ -88,70 +59,47 @@ namespace MgGSM.Screens
             PlayerIndex playerIndex;
 
             // Move to the previous menu entry?
-            if (menuUp.Evaluate(input, ControllingPlayer, out playerIndex))
+            if (_menuUp.Evaluate(input, ControllingPlayer, out playerIndex))
             {
-                selectedEntry--;
+                _selectedEntry--;
 
-                if (selectedEntry < 0)
-                    selectedEntry = menuEntries.Count - 1;
+                if (_selectedEntry < 0)
+                    _selectedEntry = _menuEntries.Count - 1;
             }
 
             // Move to the next menu entry?
-            if (menuDown.Evaluate(input, ControllingPlayer, out playerIndex))
+            if (_menuDown.Evaluate(input, ControllingPlayer, out playerIndex))
             {
-                selectedEntry++;
+                _selectedEntry++;
 
-                if (selectedEntry >= menuEntries.Count)
-                    selectedEntry = 0;
+                if (_selectedEntry >= _menuEntries.Count)
+                    _selectedEntry = 0;
             }
 
-            if (menuSelect.Evaluate(input, ControllingPlayer, out playerIndex))
-            {
-                OnSelectEntry(selectedEntry, playerIndex);
-            }
-            else if (menuCancel.Evaluate(input, ControllingPlayer, out playerIndex))
-            {
+            if (_menuSelect.Evaluate(input, ControllingPlayer, out playerIndex))
+                OnSelectEntry(_selectedEntry, playerIndex);
+            else if (_menuCancel.Evaluate(input, ControllingPlayer, out playerIndex))
                 OnCancel(playerIndex);
-            }
         }
 
-
-        /// <summary>
-        /// Handler for when the user has chosen a menu entry.
-        /// </summary>
         protected virtual void OnSelectEntry(int entryIndex, PlayerIndex playerIndex)
         {
-            menuEntries[entryIndex].OnSelectEntry(playerIndex);
+            _menuEntries[entryIndex].OnSelectEntry(playerIndex);
         }
 
-
-        /// <summary>
-        /// Handler for when the user has cancelled the menu.
-        /// </summary>
         protected virtual void OnCancel(PlayerIndex playerIndex)
         {
             ExitScreen();
         }
 
-
-        /// <summary>
-        /// Helper overload makes it easy to use OnCancel as a MenuEntry event handler.
-        /// </summary>
+        // Helper overload makes it easy to use OnCancel as a MenuEntry event handler.
         protected void OnCancel(object sender, PlayerIndexEventArgs e)
         {
             OnCancel(e.PlayerIndex);
         }
 
-
-        #endregion
-
-        #region Update and Draw
-
-
-        /// <summary>
-        /// Allows the screen the chance to position the menu entries. By default
-        /// all menu entries are lined up in a vertical list, centered on the screen.
-        /// </summary>
+        // Allows the screen the chance to position the menu entries. By default,
+        // all menu entries are lined up in a vertical list, centered on the screen.
         protected virtual void UpdateMenuEntryLocations()
         {
             // Make the menu slide into place during transitions, using a
@@ -160,12 +108,12 @@ namespace MgGSM.Screens
             float transitionOffset = (float)Math.Pow(TransitionPosition, 2);
 
             // start at Y = 175; each X value is generated per entry
-            Vector2 position = new Vector2(0f, 175f);
+            var position = new Vector2(0f, 175f);
 
             // update each menu entry's location in turn
-            for (int i = 0; i < menuEntries.Count; i++)
+            for (int i = 0; i < _menuEntries.Count; i++)
             {
-                MenuEntry menuEntry = menuEntries[i];
+                var menuEntry = _menuEntries[i];
                 
                 // each entry is to be centered horizontally
                 position.X = ScreenManager.GraphicsDevice.Viewport.Width / 2 - menuEntry.GetWidth(this) / 2;
@@ -183,46 +131,34 @@ namespace MgGSM.Screens
             }
         }
 
-
-        /// <summary>
-        /// Updates the menu.
-        /// </summary>
-        public override void Update(GameTime gameTime, bool otherScreenHasFocus,
-                                                       bool coveredByOtherScreen)
+        public override void Update(GameTime gameTime, bool otherScreenHasFocus, bool coveredByOtherScreen)
         {
             base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
 
             // Update each nested MenuEntry object.
-            for (int i = 0; i < menuEntries.Count; i++)
+            for (int i = 0; i < _menuEntries.Count; i++)
             {
-                bool isSelected = IsActive && (i == selectedEntry);
-
-                menuEntries[i].Update(this, isSelected, gameTime);
+                bool isSelected = IsActive && (i == _selectedEntry);
+                _menuEntries[i].Update(this, isSelected, gameTime);
             }
         }
 
-
-        /// <summary>
-        /// Draws the menu.
-        /// </summary>
         public override void Draw(GameTime gameTime)
         {
             // make sure our entries are in the right place before we draw them
             UpdateMenuEntryLocations();
 
-            GraphicsDevice graphics = ScreenManager.GraphicsDevice;
-            SpriteBatch spriteBatch = ScreenManager.SpriteBatch;
-            SpriteFont font = ScreenManager.Font;
+            var graphics = ScreenManager.GraphicsDevice;
+            var spriteBatch = ScreenManager.SpriteBatch;
+            var font = ScreenManager.Font;
 
             spriteBatch.Begin();
 
             // Draw each menu entry in turn.
-            for (int i = 0; i < menuEntries.Count; i++)
+            for (int i = 0; i < _menuEntries.Count; i++)
             {
-                MenuEntry menuEntry = menuEntries[i];
-
-                bool isSelected = IsActive && (i == selectedEntry);
-
+                var menuEntry = _menuEntries[i];
+                bool isSelected = IsActive && (i == _selectedEntry);
                 menuEntry.Draw(this, isSelected, gameTime);
             }
 
@@ -232,20 +168,17 @@ namespace MgGSM.Screens
             float transitionOffset = (float)Math.Pow(TransitionPosition, 2);
 
             // Draw the menu title centered on the screen
-            Vector2 titlePosition = new Vector2(graphics.Viewport.Width / 2, 80);
-            Vector2 titleOrigin = font.MeasureString(menuTitle) / 2;
-            Color titleColor = new Color(192, 192, 192) * TransitionAlpha;
+            var titlePosition = new Vector2(graphics.Viewport.Width / 2, 80);
+            var titleOrigin = font.MeasureString(_menuTitle) / 2;
+            var titleColor = new Color(192, 192, 192) * TransitionAlpha;
             float titleScale = 1.25f;
 
             titlePosition.Y -= transitionOffset * 100;
 
-            spriteBatch.DrawString(font, menuTitle, titlePosition, titleColor, 0,
-                                   titleOrigin, titleScale, SpriteEffects.None, 0);
+            spriteBatch.DrawString(font, _menuTitle, titlePosition, titleColor, 0,
+                titleOrigin, titleScale, SpriteEffects.None, 0);
 
             spriteBatch.End();
         }
-
-
-        #endregion
     }
 }
