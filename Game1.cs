@@ -5,6 +5,10 @@ using Microsoft.Xna.Framework.Input;
 
 namespace MgGSM
 {
+    // Sample showing how to manage different game states, with transitions
+    // between menu screens, a loading screen, the game itself, and a pause
+    // menu. This main game class is extremely simple: all the interesting
+    // stuff happens in the ScreenManager component.
     public class Game1 : Game
     {
         private GraphicsDeviceManager _graphics;
@@ -27,7 +31,6 @@ namespace MgGSM
         
         private void AddInitialScreens()
         {
-            // Activate the first screens.
             _screenManager.AddScreen(new BackgroundScreen(), null);
             _screenManager.AddScreen(new MainMenuScreen(), null);
         }
@@ -50,7 +53,7 @@ namespace MgGSM
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
-            base.Draw(gameTime);
+            base.Draw(gameTime);    // The real drawing happens inside the ScreenManager component
         }
     }
 }
