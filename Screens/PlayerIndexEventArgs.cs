@@ -7,13 +7,11 @@ namespace MgGSM.Screens
     // triggered the event. This is used by the MenuEntry.Selected event.
     public class PlayerIndexEventArgs : EventArgs
     {
-        private readonly PlayerIndex _playerIndex;
-
-        public PlayerIndex PlayerIndex => _playerIndex;
+        public PlayerIndex PlayerIndex { get; }
 
         public PlayerIndexEventArgs(PlayerIndex playerIndex)
         {
-            _playerIndex = playerIndex;
+            PlayerIndex = playerIndex;
         }
     }
 }
