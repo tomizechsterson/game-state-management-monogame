@@ -36,12 +36,10 @@ namespace MgGSM.Screens
 
             _menuSelect = new InputAction(
                 new[] { Buttons.A, Buttons.Start },
-                new[] { Keys.Enter, Keys.Space },
-                true);
+                new[] { Keys.Enter, Keys.Space }, true);
             _menuCancel = new InputAction(
                 new[] { Buttons.B, Buttons.Back },
-                new[] { Keys.Back },
-                true);
+                new[] { Keys.Back }, true);
         }
 
         // Loads graphics content for this screen. This uses the shared ContentManager
@@ -66,12 +64,12 @@ namespace MgGSM.Screens
             // controlling player, the InputState helper returns to us which player
             // actually provided the input. We pass that through to our Accepted and
             // Cancelled events, so they can tell which player triggered them.
-            if (_menuSelect.Evaluate(input, ControllingPlayer, out playerIndex))
+            if (_menuSelect.Occurred(input, ControllingPlayer, out playerIndex))
             {
                 Accepted?.Invoke(this, new PlayerIndexEventArgs(playerIndex));
                 ExitScreen();
             }
-            else if (_menuCancel.Evaluate(input, ControllingPlayer, out playerIndex))
+            else if (_menuCancel.Occurred(input, ControllingPlayer, out playerIndex))
             {
                 Cancelled?.Invoke(this, new PlayerIndexEventArgs(playerIndex));
                 ExitScreen();

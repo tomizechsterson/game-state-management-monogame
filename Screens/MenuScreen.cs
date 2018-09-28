@@ -32,20 +32,16 @@ namespace MgGSM.Screens
 
             _menuUp = new InputAction(
                 new[] { Buttons.DPadUp, Buttons.LeftThumbstickUp }, 
-                new[] { Keys.Up },
-                true);
+                new[] { Keys.Up }, true);
             _menuDown = new InputAction(
                 new[] { Buttons.DPadDown, Buttons.LeftThumbstickDown },
-                new[] { Keys.Down },
-                true);
+                new[] { Keys.Down }, true);
             _menuSelect = new InputAction(
                 new[] { Buttons.A, Buttons.Start },
-                new[] { Keys.Enter, Keys.Space },
-                true);
+                new[] { Keys.Enter, Keys.Space }, true);
             _menuCancel = new InputAction(
                 new[] { Buttons.B, Buttons.Back },
-                new[] { Keys.Back },
-                true);
+                new[] { Keys.Back }, true);
         }
 
         // Responds to user input, changing the selected entry and accepting or cancelling the menu.
@@ -58,7 +54,7 @@ namespace MgGSM.Screens
             // OnSelectEntry and OnCancel, so they can tell which player triggered them.
             PlayerIndex playerIndex;
 
-            if (_menuUp.Evaluate(input, ControllingPlayer, out playerIndex))
+            if (_menuUp.Occurred(input, ControllingPlayer, out playerIndex))
             {
                 _selectedEntry--;
 
@@ -66,7 +62,7 @@ namespace MgGSM.Screens
                     _selectedEntry = _menuEntries.Count - 1;
             }
 
-            if (_menuDown.Evaluate(input, ControllingPlayer, out playerIndex))
+            if (_menuDown.Occurred(input, ControllingPlayer, out playerIndex))
             {
                 _selectedEntry++;
 
@@ -74,9 +70,9 @@ namespace MgGSM.Screens
                     _selectedEntry = 0;
             }
 
-            if (_menuSelect.Evaluate(input, ControllingPlayer, out playerIndex))
+            if (_menuSelect.Occurred(input, ControllingPlayer, out playerIndex))
                 OnSelectEntry(_selectedEntry, playerIndex);
-            else if (_menuCancel.Evaluate(input, ControllingPlayer, out playerIndex))
+            else if (_menuCancel.Occurred(input, ControllingPlayer, out playerIndex))
                 OnCancel(playerIndex);
         }
 

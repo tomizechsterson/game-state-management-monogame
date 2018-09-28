@@ -135,7 +135,7 @@ namespace MgGSM.Screens
             bool gamePadDisconnected = !gamePadState.IsConnected && input.GamePadWasConnected[playerIndex];
 
             PlayerIndex player;
-            if (_pauseAction.Evaluate(input, ControllingPlayer, out player) || gamePadDisconnected)
+            if (_pauseAction.Occurred(input, ControllingPlayer, out player) || gamePadDisconnected)
             {
 #if WINDOWS_PHONE
                 ScreenManager.AddScreen(new PhonePauseScreen(), ControllingPlayer);

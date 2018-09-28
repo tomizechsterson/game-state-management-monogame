@@ -3,78 +3,63 @@ using Microsoft.Xna.Framework.Input;
 
 namespace MgGSM.StateManagement
 {
-    /// <summary>
-    /// Defines an action that is designated by some set of buttons and/or keys.
-    /// 
-    /// The way actions work is that you define a set of buttons and keys that trigger the action. You can
-    /// then evaluate the action against an InputState which will test to see if any of the buttons or keys
-    /// are pressed by a player. You can also set a flag that indicates if the action only occurs once when
-    /// the buttons/keys are first pressed or whether the action should occur each frame.
-    /// 
-    /// Using this InputAction class means that you can configure new actions based on keys and buttons
-    /// without having to directly modify the InputState type. This means more customization by your games
-    /// without having to change the core classes of Game State Management.
-    /// </summary>
+    // Defines an action that is designated by some set of buttons and/or keys.
+    // 
+    // The way actions work is that you define a set of buttons and keys that trigger the action. You can
+    // then evaluate the action against an InputState which will test to see if any of the buttons or keys
+    // are pressed by a player. You can also set a flag that indicates if the action only occurs once when
+    // the buttons/keys are first pressed or whether the action should occur each frame.
+    // 
+    // Using this InputAction class means that you can configure new actions based on keys and buttons
+    // without having to directly modify the InputState type. This means more customization by your games
+    // without having to change the core classes of Game State Management.
     public class InputAction
     {
-        private readonly Buttons[] buttons;
-        private readonly Keys[] keys;
-        private readonly bool newPressOnly;
+        private readonly Buttons[] _buttons;
+        private readonly Keys[] _keys;
+        private readonly bool _firstPressOnly;
 
-        // These delegate types map to the methods on InputState. We use these to simplify the evalute method
+        // These delegate types map to the methods on InputState. We use these to simplify the Occurred method
         // by allowing us to map the appropriate delegates and invoke them, rather than having two separate code paths.
         private delegate bool ButtonPress(Buttons button, PlayerIndex? controllingPlayer, out PlayerIndex player);
         private delegate bool KeyPress(Keys key, PlayerIndex? controllingPlayer, out PlayerIndex player);
 
-        /// <summary>
-        /// Initializes a new InputAction.
-        /// </summary>
-        /// <param name="buttons">An array of buttons that can trigger the action.</param>
-        /// <param name="keys">An array of keys that can trigger the action.</param>
-        /// <param name="newPressOnly">Whether the action only occurs on the first press of one of the buttons/keys, 
-        /// false if it occurs each frame one of the buttons/keys is down.</param>
-        public InputAction(Buttons[] buttons, Keys[] keys, bool newPressOnly)
+        public InputAction(Buttons[] triggerButtons, Keys[] triggerKeys, bool firstPressOnly)
         {
             // Store the buttons and keys. If the arrays are null, we create a 0 length array so we don't
-            // have to do null checks in the Evaluate method
-            this.buttons = buttons != null ? buttons.Clone() as Buttons[] : new Buttons[0];
-            this.keys = keys != null ? keys.Clone() as Keys[] : new Keys[0];
-
-            this.newPressOnly = newPressOnly;
+            // have to do null checks in the Occurred method
+            _buttons = triggerButtons != null ? triggerButtons.Clone() as Buttons[] : new Buttons[0];
+            _keys = triggerKeys != null ? triggerKeys.Clone() as Keys[] : new Keys[0];
+            _firstPressOnly = firstPressOnly;
         }
 
-        /// <summary>
-        /// Evaluates the action against a given InputState.
-        /// </summary>
-        /// <param name="state">The InputState to test for the action.</param>
-        /// <param name="controllingPlayer">The player to test, or null to allow any player.</param>
-        /// <param name="player">If controllingPlayer is null, this is the player that performed the action.</param>
-        /// <returns>True if the action occurred, false otherwise.</returns>
-        public bool Evaluate(InputState state, PlayerIndex? controllingPlayer, out PlayerIndex player)
+        // If playerToTest is null, the player parameter will be the player that performed the action
+        public bool Occurred(InputState stateToTest, PlayerIndex? playerToTest, out PlayerIndex player)
         {
-            // Figure out which delegate methods to map from the state which takes care of our "newPressOnly" logic
+            // Figure out which delegate methods to map from the state which takes care of our "firstPressOnly" logic
             ButtonPress buttonTest;
             KeyPress keyTest;
-            if (newPressOnly)
+
+            if (_firstPressOnly)
             {
-                buttonTest = state.IsNewButtonPress;
-                keyTest = state.IsNewKeyPress;
+                buttonTest = stateToTest.IsNewButtonPress;
+                keyTest = stateToTest.IsNewKeyPress;
             }
             else
             {
-                buttonTest = state.IsButtonPressed;
-                keyTest = state.IsKeyPressed;
+                buttonTest = stateToTest.IsButtonPressed;
+                keyTest = stateToTest.IsKeyPressed;
             }
 
             // Now we simply need to invoke the appropriate methods for each button and key in our collections
-            foreach (Buttons button in buttons)
+            foreach (var button in _buttons)
             {
-                if (buttonTest(button, controllingPlayer, out player))
+                if (buttonTest(button, playerToTest, out player))
                     return true;
             }
-            foreach (Keys key in keys)
+            foreach (var key in _keys)
             {
-                if (keyTest(key, controllingPlayer, out player))
+                if (keyTest(key, playerToTest, out player))
                     return true;
             }
 
