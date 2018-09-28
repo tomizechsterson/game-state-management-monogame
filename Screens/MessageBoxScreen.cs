@@ -17,12 +17,9 @@ namespace MgGSM.Screens
         public event EventHandler<PlayerIndexEventArgs> Accepted;
         public event EventHandler<PlayerIndexEventArgs> Cancelled;
 
-        // Constructor automatically includes the standard "A=ok, B=cancel" usage text prompt.
-        public MessageBoxScreen(string message) : this(message, true) { }
-
         // Constructor lets the caller specify whether to include the standard
         // "A=ok, B=cancel" usage text prompt.
-        public MessageBoxScreen(string message, bool includeUsageText)
+        public MessageBoxScreen(string message, bool includeUsageText = true)
         {
             const string usageText = "\nA button, Space, Enter = ok" +
                                      "\nB button, Backspace = cancel"; 
@@ -60,7 +57,6 @@ namespace MgGSM.Screens
             }
         }
 
-        /// Responds to user input, accepting or cancelling the message box.
         public override void HandleInput(GameTime gameTime, InputState input)
         {
             PlayerIndex playerIndex;
