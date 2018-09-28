@@ -65,7 +65,7 @@ namespace MgGSM.Screens
         }
 
 
-        public override void Deactivate()
+        protected override void Deactivate()
         {
 #if WINDOWS_PHONE
             Microsoft.Phone.Shell.PhoneApplicationService.Current.State["PlayerPosition"] = playerPosition;
@@ -105,7 +105,7 @@ namespace MgGSM.Screens
                 _enemyPosition.Y += (float)(_random.NextDouble() - 0.5) * randomization;
 
                 // Apply a stabilizing force to stop the enemy moving off the screen.
-                Vector2 targetPosition = new Vector2(
+                var targetPosition = new Vector2(
                     ScreenManager.GraphicsDevice.Viewport.Width / 2 - _gameFont.MeasureString("Insert Gameplay Here").X / 2, 
                     200);
 
@@ -120,7 +120,7 @@ namespace MgGSM.Screens
         public override void HandleInput(GameTime gameTime, InputState input)
         {
             if (input == null)
-                throw new ArgumentNullException("input");
+                throw new ArgumentNullException(nameof(input));
 
             // Look up inputs for the active player profile.
             int playerIndex = (int)ControllingPlayer.Value;
