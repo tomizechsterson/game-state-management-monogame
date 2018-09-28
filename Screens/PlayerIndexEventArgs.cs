@@ -3,25 +3,17 @@ using Microsoft.Xna.Framework;
 
 namespace MgGSM.Screens
 {
+    // Custom event argument which includes the index of the player who
+    // triggered the event. This is used by the MenuEntry.Selected event.
     public class PlayerIndexEventArgs : EventArgs
     {
-        /// <summary>
-        /// Constructor.
-        /// </summary>
+        private readonly PlayerIndex _playerIndex;
+
+        public PlayerIndex PlayerIndex => _playerIndex;
+
         public PlayerIndexEventArgs(PlayerIndex playerIndex)
         {
-            this.playerIndex = playerIndex;
+            _playerIndex = playerIndex;
         }
-
-
-        /// <summary>
-        /// Gets the index of the player who triggered this event.
-        /// </summary>
-        public PlayerIndex PlayerIndex
-        {
-            get { return playerIndex; }
-        }
-
-        PlayerIndex playerIndex;
     }
 }
