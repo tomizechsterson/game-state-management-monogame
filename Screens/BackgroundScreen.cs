@@ -6,6 +6,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace MgGSM.Screens
 {
+    // The background screen sits behind all the other menu screens.
+    // It draws a background image that remains fixed in place regardless
+    // of whatever transitions the screens on top of it may be doing.
     public class BackgroundScreen : GameScreen
     {
         private ContentManager _content;
@@ -20,7 +23,7 @@ namespace MgGSM.Screens
         /// <summary>
         /// Loads graphics content for this screen. The background texture is quite
         /// big, so we use our own local ContentManager to load it. This allows us
-        /// to unload before going from the menus into the game itself, wheras if we
+        /// to unload before going from the menus into the game itself, whereas if we
         /// used the shared ContentManager provided by the Game class, the content
         /// would remain loaded forever.
         /// </summary>

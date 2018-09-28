@@ -8,6 +8,9 @@ using Microsoft.Xna.Framework.Input;
 
 namespace MgGSM.Screens
 {
+    // This screen implements the actual game logic. It is just a
+    // placeholder to get the idea across: you'll probably want to
+    // put some more interesting gameplay in here!
     public class GameplayScreen : GameScreen
     {
         private ContentManager _content;
