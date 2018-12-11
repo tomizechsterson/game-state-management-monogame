@@ -11,11 +11,11 @@ namespace MgGSM.StateManagement
     // as screens.
     public abstract class GameScreen
     {
-        /// Normally when one screen is brought up over the top of another,
-        /// the first screen will transition off to make room for the new
-        /// one. This property indicates whether the screen is only a small
-        /// popup, in which case screens underneath it do not need to bother
-        /// transitioning off.
+        // Normally when one screen is brought up over the top of another,
+        // the first screen will transition off to make room for the new
+        // one. This property indicates whether the screen is only a small
+        // popup, in which case screens underneath it do not need to bother
+        // transitioning off.
         public bool IsPopup { get; protected set; }
 
         protected TimeSpan TransitionOnTime
